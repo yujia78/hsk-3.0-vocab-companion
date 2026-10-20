@@ -37,11 +37,12 @@ input[type=search],select,textarea{width:100%;border:1px solid var(--line);backg
 .seg button{border:1px solid var(--line);background:transparent;border-radius:8px;padding:6px 14px;min-height:40px}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 #list{list-style:none;margin:8px 0;padding:0}
-.w{display:grid;grid-template-columns:84px 1fr auto;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:8px}
+.w{display:grid;grid-template-columns:136px 1fr auto;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:8px}
 .w.s1{border-left-color:var(--amber)}.w.s2{border-left-color:var(--jade)}
-.hz{height:60px;display:grid;place-items:center;text-align:center;border:1px solid var(--line);border-radius:4px;font:500 30px/1.2 'Noto Serif SC','Songti SC','SimSun',serif;word-break:break-all;
+.hz{--s:34px;display:flex;flex-wrap:nowrap;justify-content:flex-start;font-family:'Noto Serif SC','Songti SC','SimSun',serif;font-weight:500;font-size:calc(var(--s)*.6);line-height:1}
+.c{flex:none;width:var(--s);height:var(--s);display:grid;place-items:center;border:1px solid var(--line);
 background:repeating-linear-gradient(to bottom,var(--line) 0 3px,transparent 3px 6px) center/1px 100% no-repeat,repeating-linear-gradient(to right,var(--line) 0 3px,transparent 3px 6px) center/100% 1px no-repeat}
-.z3{font-size:22px}.z4{font-size:15px}
+.c+.c{margin-left:-1px}
 .py{font-weight:600}.mn{color:var(--mute);font-size:14px}
 .chip{min-width:84px;min-height:44px;border-radius:22px;border:1px solid var(--line);background:transparent;font-size:14px;font-weight:600}
 .s1 .chip{background:var(--amber);border-color:var(--amber);color:#14110A}
@@ -52,13 +53,13 @@ background:repeating-linear-gradient(to bottom,var(--line) 0 3px,transparent 3px
 .set summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;align-items:center}
 .set label{display:grid;gap:6px;margin:8px 0;font-weight:600}
 textarea{font:13px/1.4 ui-monospace,Menlo,Consolas,monospace;margin-top:8px}
-@media (max-width:420px){.w{grid-template-columns:72px 1fr;}.chip{grid-column:1/-1}.hz{height:52px}}
+@media (max-width:420px){.w{grid-template-columns:136px 1fr}.chip{grid-column:1/-1}}
 button:disabled{opacity:.45;cursor:default}
 .view{margin-top:16px}
 .acts .pri,button.pri{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 #rshow{width:100%;min-height:52px;border:1px solid var(--ink);border-radius:8px;padding:10px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:20px 16px;margin:12px 0;min-height:240px;display:grid;gap:14px;align-content:center;justify-items:center;text-align:center}
-.hz.xl{width:min(100%,260px);height:140px;font-weight:700}
+.hz.xl{--s:min(80px,calc((100vw - 72px)/4));justify-content:center;font-weight:700}
 .grades{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .grades button{border:1px solid var(--line);background:var(--surface);border-radius:8px;min-height:56px;font-weight:600;padding:6px}
 .grades small{display:block;font-weight:400;color:var(--mute);font-size:12px}
@@ -151,8 +152,9 @@ function match(w){const s=S.P[w[0]]||0;
  if(S.filter!=='all'&&s!==({new:0,learning:1,known:2})[S.filter])return false;
  if(!S.q)return true;
  return w[1].includes(S.q)||w[5].includes(norm(S.q))||w[6].includes(S.q.toLowerCase())}
-function rowHTML(w){const s=S.P[w[0]]||0,h=w[1],n=[...h].length;
- return `<li class="w s${s}"><div class="hz z${n>4?4:n}" lang="zh-Hans">${esc(h)}</div><div><div class="py">${esc(w[2])}</div><div class="mn">${esc(w[3])}</div></div><button class="chip" data-k="${w[0]}" aria-label="${esc(h)}: ${ST[s]}. Tap to change status">${ST[s]}</button></li>`}
+function cells(h){return[...h].map(c=>`<span class="c">${esc(c)}</span>`).join('')}
+function rowHTML(w){const s=S.P[w[0]]||0,h=w[1];
+ return `<li class="w s${s}"><div class="hz" lang="zh-Hans">${cells(h)}</div><div><div class="py">${esc(w[2])}</div><div class="mn">${esc(w[3])}</div></div><button class="chip" data-k="${w[0]}" aria-label="${esc(h)}: ${ST[s]}. Tap to change status">${ST[s]}</button></li>`}
 function meta(){const n=cur().filter(match).length;
  $('count').textContent=`${n} word${n===1?'':'s'}`;
  $('more').hidden=n<=S.limit;$('more').textContent=`Show more (${Math.max(0,n-S.limit)} left)`}
@@ -206,7 +208,7 @@ function showCard(){
  const w=D[Q.q[Q.i]-1],n=[...w[1]].length;
  Q.rev=S.mode==='rev'||(S.mode==='mix'&&Math.random()<.5);
  $('rprog').textContent=`Card ${Q.i+1} of ${Q.q.length}${Q.rev?'. Recall the word.':''}`;
- $('rhz').textContent=w[1];$('rhz').style.fontSize=(n<=2?64:n===3?48:n===4?36:26)+'px';
+ $('rhz').innerHTML=cells(w[1]);
  $('rpy').textContent=w[2];$('rmn').textContent=w[3];
  $('rq').textContent=w[3];$('rq').hidden=!Q.rev;$('rhz').hidden=Q.rev;$('rmn').hidden=Q.rev;
  Q.shown=false;$('rans').hidden=true;$('rgr').hidden=true;$('rshow').hidden=false}
