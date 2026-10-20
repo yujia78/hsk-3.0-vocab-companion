@@ -39,6 +39,7 @@ input[type=search],select,textarea{width:100%;border:1px solid var(--line);backg
 #list{list-style:none;margin:8px 0;padding:0}
 .w{display:grid;grid-template-columns:136px 1fr auto;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:8px}
 .w.s1{border-left-color:var(--amber)}.w.s2{border-left-color:var(--jade)}
+.w{cursor:pointer;-webkit-tap-highlight-color:transparent}.w:active{background:var(--bg)}
 .hz{--s:34px;display:flex;flex-wrap:nowrap;justify-content:flex-start;font-family:'Noto Serif SC','Songti SC','SimSun',serif;font-weight:500;font-size:calc(var(--s)*.6);line-height:1}
 .c{flex:none;width:var(--s);height:var(--s);display:grid;place-items:center;border:1px solid var(--line);
 background:repeating-linear-gradient(to bottom,var(--line) 0 3px,transparent 3px 6px) center/1px 100% no-repeat,repeating-linear-gradient(to right,var(--line) 0 3px,transparent 3px 6px) center/100% 1px no-repeat}
@@ -53,7 +54,7 @@ background:repeating-linear-gradient(to bottom,var(--line) 0 3px,transparent 3px
 .set summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;align-items:center}
 .set label{display:grid;gap:6px;margin:8px 0;font-weight:600}
 textarea{font:13px/1.4 ui-monospace,Menlo,Consolas,monospace;margin-top:8px}
-@media (max-width:420px){.w{grid-template-columns:136px 1fr;grid-template-areas:"h t" "c t";row-gap:8px}.w .hz{grid-area:h}.w .tx{grid-area:t}.chip{grid-area:c;justify-self:start;min-width:72px;min-height:36px;font-size:13px}}
+@media (max-width:420px){.w{grid-template-columns:136px 1fr;grid-template-areas:"h t" "c t";row-gap:8px}.w .hz{grid-area:h}.w .tx{grid-area:t}.chip{grid-area:c;justify-self:start;min-width:64px;min-height:28px;font-size:12px}}
 button:disabled{opacity:.45;cursor:default}
 .view{margin-top:16px}
 .acts .pri,button.pri{background:var(--ink);color:var(--bg);border-color:var(--ink)}
@@ -156,7 +157,7 @@ function cells(h){return[...h].map(c=>`<span class="c">${esc(c)}</span>`).join('
 function rowHTML(w){const s=S.P[w[0]]||0,h=w[1];
  return `<li class="w s${s}"><div class="hz" lang="zh-Hans">${cells(h)}</div><div class="tx"><div class="py">${esc(w[2])}</div><div class="mn">${esc(w[3])}</div></div><button class="chip" data-k="${w[0]}" aria-label="${esc(h)}: ${ST[s]}. Tap to change status">${ST[s]}</button></li>`}
 function meta(){const n=cur().filter(match).length;
- $('count').textContent=`${n} word${n===1?'':'s'}`;
+ $('count').textContent=`${n} word${n===1?'':'s'}. Tap a word to cycle its status.`;
  $('more').hidden=n<=S.limit;$('more').textContent=`Show more (${Math.max(0,n-S.limit)} left)`}
 function renderList(){
  const all=cur().filter(match);
@@ -168,7 +169,7 @@ $('flt').onclick=e=>{const b=e.target.closest('button');if(!b)return;S.filter=b.
  [...$('flt').children].forEach(x=>x.setAttribute('aria-pressed',x===b));renderList()};
 $('q').oninput=e=>{S.q=e.target.value.trim();S.limit=100;renderList()};
 $('more').onclick=()=>{S.limit+=100;renderList()};
-$('list').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;
+$('list').onclick=e=>{const li0=e.target.closest('.w');if(!li0||String(getSelection()))return;const b=li0.querySelector('.chip');
  const k=b.dataset.k,h=D[k-1][1],s=((S.P[k]||0)+1)%3;if(s)S.P[k]=s;else delete S.P[k];if(s===1)S.R[k]=S.R[k]||[today(),0,2.5,0,0];else delete S.R[k];save();
  const li=b.closest('li');renderHead();
  if(S.filter==='all'){li.className='w s'+s;b.textContent=ST[s];b.setAttribute('aria-label',`${h}: ${ST[s]}. Tap to change status`);meta()}
